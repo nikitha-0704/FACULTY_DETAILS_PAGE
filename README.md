@@ -1,104 +1,70 @@
-# FACULTY_DETAILS_PAGE
+# Getting Started with Create React App
 
-## Introduction
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-The Faculty Details Application is designed to streamline the management of faculty information within an educational institution. The system integrates a frontend built with React and a backend using Spring Boot, supported by a MySQL database. The application provides a user-friendly interface for faculty members to enter, update, and view their professional and personal details.
+## Available Scripts
 
-## Objectives
+In the project directory, you can run:
 
-- Develop a comprehensive system for managing faculty information.
-- Ensure data integrity and security through structured data management.
-- Provide an easy-to-use interface for faculty members to manage their details.
-- Implement authentication to secure access to the application.
+### `npm start`
 
-## Technologies Used
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-- **Frontend**: React
-  - Libraries: Axios for API calls, React Router for navigation, Material-UI for UI components.
-- **Backend**: Spring Boot
-  - Libraries: Spring Data JPA for database interaction, Spring Security for authentication.
-- **Database**: MySQL
-  - Tools: MySQL Workbench for database management.
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
+### `npm test`
 
-## Setup Instructions
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### Backend (Spring Boot)
+### `npm run build`
 
-1. **Clone the repository:**
-    ```bash
-    git clone https://github.com/yourusername/faculty_details_page.git
-    cd faculty_details_page
-    ```
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-2. **Set up the MySQL database:**
-    - Create a database named `faculty_db`.
-    - Update the database configurations in `src/main/resources/application.properties` file:
-      ```properties
-      spring.datasource.url=jdbc:mysql://localhost:3306/faculty_db
-      spring.datasource.username=root
-      spring.datasource.password=yourpassword
-      spring.jpa.hibernate.ddl-auto=update
-      ```
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-3. **Run the Spring Boot application:**
-    ```bash
-    mvn clean install
-    mvn spring-boot:run
-    ```
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### Frontend (React)
+### `npm run eject`
 
-1. **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-2. **Install the dependencies:**
-    ```bash
-    npm install
-    ```
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-3. **Run the React application:**
-    ```bash
-    npm start
-    ```
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-## Usage
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-1. **Access the application:**
-   - Open your browser and navigate to `http://localhost:3000` for the frontend.
-   - The backend API can be accessed at `http://localhost:8080`.
+## Learn More
 
-2. **Login:**
-   - Use the Google OAuth2 login to access the dashboard.
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-3. **Manage Faculty Details:**
-   - Fill in the faculty details form with collapsible sections.
-   - Save the details, which will be stored in the MySQL database.
-   - View and edit the saved details.
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-## Authentication
+### Code Splitting
 
-The application uses Google OAuth2 for user authentication. Make sure to set up a Google OAuth2 Client ID and Secret, and configure the `application.properties` file with these details.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-## Contributing
+### Analyzing the Bundle Size
 
-1. **Fork the repository.**
-2. **Create a new branch:**
-    ```bash
-    git checkout -b feature-name
-    ```
-3. **Make your changes and commit them:**
-    ```bash
-    git commit -m 'Add some feature'
-    ```
-4. **Push to the branch:**
-    ```bash
-    git push origin feature-name
-    ```
-5. **Submit a pull request.**
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-## License
+### Making a Progressive Web App
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
