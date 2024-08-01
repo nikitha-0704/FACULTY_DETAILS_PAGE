@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import './App.css'; // Your custom CSS for styling
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
+import { GoogleLogin, GoogleLogout } from 'react-google-login';
+
+// Replace with your Google Client ID
+const CLIENT_ID = '390899400310-6j78dt8uhau9cd18jjv8iqf72je2alvg.apps.googleusercontent.com';
 
 const App = () => {
     const [formData, setFormData] = useState({
@@ -24,81 +28,107 @@ const App = () => {
         teachingExperiencePriorToNITC: '',
         industryExperiencePriorToNITC: '',
         qualifications: [
-            {
-                qualification: '',
-                specialization: '',
-                nameOfBoardOrUniversity: '',
-                divisionClass: '',
-                yearOfPassing: '',
-                percentageOrCGPA: ''
-            }
+            { qualification: '', specialization: '', nameOfBoardOrUniversity: '', divisionClass: '', yearOfPassing: '', percentageOrCGPA: '' },
         ],
         facultyAppointment: {
             department: '',
             designation: '',
             payLevel: '',
             payCell: '',
-            dateOfJoining: ''
-        }
+            dateOfJoining: '',
+        },
     });
 
     const [editing, setEditing] = useState(true);
+    const [user, setUser] = useState(null);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        const keys = name.split('.');
+        if (keys.length === 1) {
+            setFormData({ ...formData, [name]: value });
+        } else if (keys.length === 2) {
+            setFormData({ ...formData, [keys[0]]: { ...formData[keys[0]], [keys[1]]: value } });
+        } else if (keys.length === 3) {
+            const updatedQualifications = formData.qualifications.map((q, index) =>
+                index === parseInt(keys[1]) ? { ...q, [keys[2]]: value } : q
+            );
+            setFormData({ ...formData, qualifications: updatedQualifications });
+        }
+    };
+
+    const addQualification = () => {
+        setFormData({
+            ...formData,
+            qualifications: [
+                ...formData.qualifications,
+                { qualification: '', specialization: '', nameOfBoardOrUniversity: '', divisionClass: '', yearOfPassing: '', percentageOrCGPA: '' },
+            ],
+        });
+    };
+
+    const removeQualification = (index) => {
+        const updatedQualifications = formData.qualifications.filter((_, i) => i !== index);
+        setFormData({ ...formData, qualifications: updatedQualifications });
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setEditing(false);
     };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        const keys = name.split('.');
-        if (keys[0] === 'qualifications') {
-            const index = keys[1];
-            const key = keys[2];
-            setFormData(prevState => {
-                const newQualifications = [...prevState.qualifications];
-                newQualifications[index][key] = value;
-                return { ...prevState, qualifications: newQualifications };
-            });
-        } else if (keys.length > 1) {
-            setFormData(prevState => {
-                const newFormData = { ...prevState };
-                newFormData[keys[0]][keys[1]] = value;
-                return newFormData;
-            });
-        } else {
-            setFormData({
-                ...formData,
-                [name]: value
-            });
-        }
+    const handleLoginSuccess = (response) => {
+        console.log('Login Success: currentUser:', response.profileObj);
+        setUser(response.profileObj);
     };
 
-    const addQualification = () => {
-        setFormData(prevState => ({
-            ...prevState,
-            qualifications: [
-                ...prevState.qualifications,
-                {
-                    qualification: '',
-                    specialization: '',
-                    nameOfBoardOrUniversity: '',
-                    divisionClass: '',
-                    yearOfPassing: '',
-                    percentageOrCGPA: ''
-                }
-            ]
-        }));
+    const handleLoginFailure = (response) => {
+        console.error('Login Failed: res:', response);
+        setUser(null);
     };
 
-    const removeQualification = (index) => {
-        setFormData(prevState => ({
-            ...prevState,
-            qualifications: prevState.qualifications.filter((_, i) => i !== index)
-        }));
+    const handleLogoutSuccess = () => {
+        console.log('Logout Successful');
+        setUser(null);
     };
 
     return (
+        <div className="container mt-4">
+             <button
+                type="button"
+                className="btn btn-secondary position-fixed"
+                style={{ top: '10px', right: '10px' }}
+                onClick={handleLogout}
+            >
+                Logout
+            </button>
+
+            <h2 className="text-center">FACULTY DETAILS</h2>
+
+            {!user ? (
+                <div className="text-center mb-4">
+                    <GoogleLogin
+                        clientId={CLIENT_ID}
+                        buttonText="Login with Google"
+                        onSuccess={handleLoginSuccess}
+                        onFailure={handleLoginFailure}
+                        cookiePolicy={'single_host_origin'}
+                    />
+                </div>
+            ) : (
+                <div className="text-center mb-4">
+                    <h4>Welcome, {user.name}!</h4>
+                    <img src={user.picture} alt={user.name} style={{ borderRadius: '50%', width: '50px', height: '50px' }} />
+                    <p>Email: {user.email}</p>
+                    <GoogleLogout
+                        clientId={CLIENT_ID}
+                        buttonText="Logout"
+                        onLogoutSuccess={handleLogoutSuccess}
+                    />
+                </div>
+            )}
+
+return (
         <div className="container mt-4">
             <h2 className="text-center">FACULTY DETAILS</h2>
             {editing ? (
@@ -122,15 +152,21 @@ const App = () => {
                                             </tr>
                                             <tr>
                                                 <th>Age</th>
-                                                <td><input type="text" className="form-control" name="age" value={formData.age} onChange={handleChange} /></td>
+                                                <td><input type="number" className="form-control" name="age" value={formData.age} onChange={handleChange} /></td>
                                             </tr>
                                             <tr>
                                                 <th>Date of Birth</th>
-                                                <td><input type="text" className="form-control" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} /></td>
+                                                <td><input type="date" className="form-control" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} /></td>
                                             </tr>
                                             <tr>
                                                 <th>Marital Status</th>
-                                                <td><input type="text" className="form-control" name="maritalStatus" value={formData.maritalStatus} onChange={handleChange} /></td>
+                                                <td>
+                                                    <select className="form-control" name="maritalStatus" value={formData.maritalStatus} onChange={handleChange}>
+                                                        <option value="">Select</option>
+                                                        <option value="Single">Single</option>
+                                                        <option value="Married">Married</option>
+                                                    </select>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>PAN</th>
@@ -170,11 +206,11 @@ const App = () => {
                                             </tr>
                                             <tr>
                                                 <th>Current Address</th>
-                                                <td><input type="text" className="form-control" name="currentAddress" value={formData.currentAddress} onChange={handleChange} /></td>
+                                                <td><textarea className="form-control" name="currentAddress" value={formData.currentAddress} onChange={handleChange}></textarea></td>
                                             </tr>
                                             <tr>
                                                 <th>Permanent Address</th>
-                                                <td><input type="text" className="form-control" name="permanentAddress" value={formData.permanentAddress} onChange={handleChange} /></td>
+                                                <td><textarea className="form-control" name="permanentAddress" value={formData.permanentAddress} onChange={handleChange}></textarea></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -215,49 +251,44 @@ const App = () => {
                             </div>
                         </div>
                         <div className="card">
-                            <div className="card-header" id="qualificationDetailsHeading">
+                            <div className="card-header" id="qualificationsHeading">
                                 <h2 className="mb-0">
-                                    <button className="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#qualificationDetails" aria-expanded="false" aria-controls="qualificationDetails">
+                                    <button className="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#qualifications" aria-expanded="false" aria-controls="qualifications">
                                         QUALIFICATION DETAILS
                                     </button>
                                 </h2>
                             </div>
-                            <div id="qualificationDetails" className="collapse" aria-labelledby="qualificationDetailsHeading" data-parent="#facultyDetails">
+                            <div id="qualifications" className="collapse" aria-labelledby="qualificationsHeading" data-parent="#facultyDetails">
                                 <div className="card-body">
-                                    {formData.qualifications.map((qualification, index) => (
-                                        <div key={index} className="qualification-section mb-3">
-                                            <table className="table table-bordered">
-                                                <tbody>
-                                                    <tr>
-                                                        <th>Qualification</th>
-                                                        <td><input type="text" className="form-control" name={`qualifications.${index}.qualification`} value={qualification.qualification} onChange={handleChange} /></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Specialization</th>
-                                                        <td><input type="text" className="form-control" name={`qualifications.${index}.specialization`} value={qualification.specialization} onChange={handleChange} /></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Name of Board/University</th>
-                                                        <td><input type="text" className="form-control" name={`qualifications.${index}.nameOfBoardOrUniversity`} value={qualification.nameOfBoardOrUniversity} onChange={handleChange} /></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Division/Class</th>
-                                                        <td><input type="text" className="form-control" name={`qualifications.${index}.divisionClass`} value={qualification.divisionClass} onChange={handleChange} /></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Year of Passing</th>
-                                                        <td><input type="text" className="form-control" name={`qualifications.${index}.yearOfPassing`} value={qualification.yearOfPassing} onChange={handleChange} /></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Percentage/CGPA</th>
-                                                        <td><input type="text" className="form-control" name={`qualifications.${index}.percentageOrCGPA`} value={qualification.percentageOrCGPA} onChange={handleChange} /></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <button type="button" className="btn btn-danger" onClick={() => removeQualification(index)}>Remove</button>
-                                        </div>
-                                    ))}
-                                    <button type="button" className="btn btn-primary" onClick={addQualification}>Add Qualification</button>
+                                    <table className="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Qualification</th>
+                                                <th>Specialization</th>
+                                                <th>Name of Board/University</th>
+                                                <th>Division/Class</th>
+                                                <th>Year of Passing</th>
+                                                <th>Percentage/CGPA</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {formData.qualifications.map((qualification, index) => (
+                                                <tr key={index}>
+                                                    <td><input type="text" className="form-control" name={qualifications.${index}.qualification} value={qualification.qualification} onChange={handleChange} /></td>
+                                                    <td><input type="text" className="form-control" name={qualifications.${index}.specialization} value={qualification.specialization} onChange={handleChange} /></td>
+                                                    <td><input type="text" className="form-control" name={qualifications.${index}.nameOfBoardOrUniversity} value={qualification.nameOfBoardOrUniversity} onChange={handleChange} /></td>
+                                                    <td><input type="text" className="form-control" name={qualifications.${index}.divisionClass} value={qualification.divisionClass} onChange={handleChange} /></td>
+                                                    <td><input type="text" className="form-control" name={qualifications.${index}.yearOfPassing} value={qualification.yearOfPassing} onChange={handleChange} /></td>
+                                                    <td><input type="text" className="form-control" name={qualifications.${index}.percentageOrCGPA} value={qualification.percentageOrCGPA} onChange={handleChange} /></td>
+                                                    <td>
+                                                        <button type="button" className="btn btn-danger" onClick={() => removeQualification(index)}>x</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                    <button type="button" className="btn btn-success btn-sm mr-1" onClick={addQualification}>+Add Qualification</button>
                                 </div>
                             </div>
                         </div>
@@ -291,7 +322,7 @@ const App = () => {
                                             </tr>
                                             <tr>
                                                 <th>Date of Joining</th>
-                                                <td><input type="text" className="form-control" name="facultyAppointment.dateOfJoining" value={formData.facultyAppointment.dateOfJoining} onChange={handleChange} /></td>
+                                                <td><input type="date" className="form-control" name="facultyAppointment.dateOfJoining" value={formData.facultyAppointment.dateOfJoining} onChange={handleChange} /></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -299,8 +330,8 @@ const App = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="text-center">
-                        <button type="submit" className="btn btn-success">SUBMIT</button>
+                    <div className="text-center mt-4">
+                        <button type="submit" className="btn btn-primary" >SUBMIT</button>
                     </div>
                 </form>
             ) : (
@@ -417,47 +448,39 @@ const App = () => {
                             </div>
                         </div>
                         <div className="card">
-                            <div className="card-header" id="qualificationDetailsHeading">
+                            <div className="card-header" id="qualificationsHeading">
                                 <h2 className="mb-0">
-                                    <button className="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#qualificationDetails" aria-expanded="false" aria-controls="qualificationDetails">
+                                    <button className="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#qualifications" aria-expanded="false" aria-controls="qualifications">
                                         QUALIFICATION DETAILS
                                     </button>
                                 </h2>
                             </div>
-                            <div id="qualificationDetails" className="collapse" aria-labelledby="qualificationDetailsHeading" data-parent="#facultyDetails">
+                            <div id="qualifications" className="collapse" aria-labelledby="qualificationsHeading" data-parent="#facultyDetails">
                                 <div className="card-body">
-                                    {formData.qualifications.map((qualification, index) => (
-                                        <div key={index} className="qualification-section mb-3">
-                                            <table className="table table-bordered">
-                                                <tbody>
-                                                    <tr>
-                                                        <th>Qualification</th>
-                                                        <td>{qualification.qualification}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Specialization</th>
-                                                        <td>{qualification.specialization}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Name of Board/University</th>
-                                                        <td>{qualification.nameOfBoardOrUniversity}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Division/Class</th>
-                                                        <td>{qualification.divisionClass}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Year of Passing</th>
-                                                        <td>{qualification.yearOfPassing}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Percentage/CGPA</th>
-                                                        <td>{qualification.percentageOrCGPA}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    ))}
+                                    <table className="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Qualification</th>
+                                                <th>Specialization</th>
+                                                <th>Name of Board/University</th>
+                                                <th>Division/Class</th>
+                                                <th>Year of Passing</th>
+                                                <th>Percentage/CGPA</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {formData.qualifications.map((qualification, index) => (
+                                                <tr key={index}>
+                                                    <td>{qualification.qualification}</td>
+                                                    <td>{qualification.specialization}</td>
+                                                    <td>{qualification.nameOfBoardOrUniversity}</td>
+                                                    <td>{qualification.divisionClass}</td>
+                                                    <td>{qualification.yearOfPassing}</td>
+                                                    <td>{qualification.percentageOrCGPA}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -499,8 +522,8 @@ const App = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="text-center">
-                        <button className="btn btn-primary" onClick={() => setEditing(true)}>EDIT</button>
+                    <div className="text-center mt-4">
+                        <button type="button" className="btn btn-primary" onClick={() => setEditing(true)}>EDIT</button>
                     </div>
                 </div>
             )}
